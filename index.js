@@ -1,54 +1,56 @@
-const express = require('express');
+const express = require("express");
 const app = express();
+const jwt = require("jsonwebtoken");
+app.use(express.json());
 
-//                           ##### STATUS CODE #### //
+module.exports = (req, res, next) => {
+  const array = document.getElementById("name").value;
+  if (user.indexOf(array) > -1) {
+    console.log("ENCONTROU");
+    next();
+  } else {
+    console.log("NADA ENCONTRADO");
+  }
+};
 
-/*app.post('/', (req, res,) => {
-  res.status(401).json ({Status: Não autorizado});
-});
-
-app.post('/', (req, res,) => {
-  res.sendStatus(401);
-});
-
-app.patch('/ola/:nome/:cargo', (req, res,) => {
-  res.status(500).json(Sstatus: Erro interno do servidor (Internal Server Error));
-});
-
-app.get('/ola/:nome/:cargo', (req, res,) => {
-  res.json({"Ola ": req.params.nome});
-}); */
-
-//                           ##### FIM STATUS CODE #### //
-
-
-
-               // #####  CONVERTER O BODY [req.body] DA REQUISIÇÃO PARA JSON  ##### //
-app.use(express.json())
-
-
-                              // #####  ARRAY  ##### //
-const usuario = [
-  {name: 'Henrique', email: 'henrique@hotmail.com'},
-  {name: 'Lucas', email: 'l.kuroda@hotmail.com'},
-  {name: 'Antarctica', email: 'antarctica@bol.com'}
+const user = [
+  { name: "Lucas", password: "123098" },
+  { name: "Carlos", password: "852963" },
+  { name: "Antonio", password: "key01key" },
+  { name: "Acer", password: "senhafraca123" }
 ];
 
-                              // ##### MOSTRA O ARRAY #### //
-app.get('/dados', (req, res) => {
-  res.json({usuario});
+app.post("/login", (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
+
+  //Gera a chave token
+  const token = jwt.sign(
+    { username: username, password: password },
+    "chavetoken"
+  );
+
+  res.json({ token: token });
 });
 
-                              // ##### INSERI DADOS NO ARRAY #### //
-app.post('/inserir', (req, res,) => {
-  usuario.push (req.body);
-  console.log(usuario);
-  res.json(req.body);
+app.post("/create-users", (req, res) => {
+  const token = req.body.token;
+  const decoded = jwt.verify(token, "chavetoken");
+
+  console.log('decoed: ', decoded)
+
+  if(decoded) {
+    // cria usuário
+    res.status(200).json({
+      message: 'Usuário criado.'
+    });
+  } else {
+    res.status(401).json({
+      message: 'Não autorizado.'
+    });
+  }
 });
 
-
-
-
-app.listen(3000, () => {
-  console.log('Servidor funcionando na porta 3000!');
+app.listen(9909, () => {
+  console.log("Servidor funcionando na porta 9909!");
 });
